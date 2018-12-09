@@ -42,13 +42,13 @@ const calculateTime = (time, config) => {
   let date, hour, minute;
 
   // minute cases
-  minute = config.minute == '*' ? ((config.hour != time.hour && config.hour != '*') ? '00' : time.minute) : config.minute;
+  minute = config.minute == '*' ? ((config.hour != time.hour && config.hour != '*') ? 00 : time.minute) : config.minute;
 
   // determine hour cases
   if(config.hour == '*') {
-    hour = config.minute == '*' ? time.hour : (config.minute > time.minute ? time.hour : (time.hour == 23 ? '00' : time.hour + 1));
+    hour = config.minute == '*' ? time.hour : (config.minute > time.minute ? time.hour : (time.hour == 23 ? 00 : time.hour + 1));
     // determine date
-    date = hour == '00' ? 'tomorrow' : 'today' ;
+    date = (hour == 00 && time.hour != 00)? 'tomorrow' : 'today' ;
   } else {
     // check if config hour is less than current hour
     hour = config.hour;
@@ -56,8 +56,13 @@ const calculateTime = (time, config) => {
     date = config.hour < time.hour ? 'tomorrow' : 'today';
   }
 
+  // check and enforce all 0 values within hour and minute to be 00
+  hour = hour == 0 ? '00': hour;
+  minute = minute == 0 ? '00': minute;
+
   // combine everything into string and logs it
   console.log(hour + ':' + minute + ' ' + date + ' ' + '- ' + config.file);
+  return {minute, hour, date};
 
 };
 
