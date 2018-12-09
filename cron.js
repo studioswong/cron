@@ -21,7 +21,6 @@ function fetchConfig(config) {
           file: lineArr[2],
         }
       });
-    console.log(data);
     return data;
   } catch (e) {
     console.log('Error:', e.stack);
