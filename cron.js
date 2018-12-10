@@ -1,13 +1,7 @@
 #!/usr/bin/env node
 var fs = require('fs');
 
-// take in the argument from command line input
-var args = process.argv.slice(2);
-
-const rawTime = args[0];
-const config = args[1];
-
-// parse config file into JSON format
+//function to parse config file into JSON format
 function fetchConfig(config) {
   try {
     let data = fs.readFileSync(config, 'utf8')
@@ -28,15 +22,18 @@ function fetchConfig(config) {
   return;
 }
 
-// break time from string into hour and minutes
+// function to break time from string into hour and minutes
 const parseTime = time => {
-    // NEXT STEP: check and verify input to be right format 
   const hour = parseInt(time.substring(0, 2), 10);
   const minute = parseInt(time.substring(3), 10);
+  if(Number.isNaN(hour) == true || Number.isNaN(minute) == true || hour > 24 || minute > 59) {
+    console.log('the time input is invalid. Please ensure your hour and minute inputs are correct and try again');
+    return null;
+  }
   return { hour, minute };
 };
 
-// calculates time according to config file, assuming time is already parsed as an object
+// function to calculate time according to config file, assuming time is already parsed as an object
 const calculateTime = (time, config) => {
   let date, hour, minute;
 
@@ -65,9 +62,37 @@ const calculateTime = (time, config) => {
 
 };
 
-let data = fetchConfig(config);
-let time = parseTime(rawTime);
+// take in the argument from command line input
+var args = process.argv.slice(2);
+let dataCorrect = true;
+let rawTime, config;
 
-data.map(config => {
-  calculateTime(time, config);
-})
+// check for command line inputs
+if (!args || args.length < 2){
+    console.log('please input time and config files');
+    dataCorrect = false;
+} else {
+    rawTime = args[0];
+    // initial check on time format
+    if (!rawTime.includes(':')){
+        console.log('time input format is wrong');
+        dataCorrect = false;
+    }
+    config = args[1];
+    // check config input format
+    if (typeof(config) != 'string' || !config.includes('.txt')) {
+        console.log('config file input is in wrong format');
+        dataCorrect = false;
+    }
+}
+
+if(dataCorrect){
+    let data = fetchConfig(config);
+    let time = parseTime(rawTime);
+    
+    if (time != null) {
+        data.map(config => {
+            calculateTime(time, config);
+        })
+    };
+}
